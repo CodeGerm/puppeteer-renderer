@@ -1,6 +1,5 @@
 'use strict'
 
-require('dotenv').config()
 const jwt = require('jsonwebtoken')
 const AWS = require('aws-sdk')
 const signingSecret = process.env.SIGNING_SECRET || ''
@@ -30,12 +29,14 @@ class Authentication {
 
   authToken(token, res) {
     if (!token) return res.status(401).send({ auth: false, message: 'No token provided.' })
+    console.log('jwt authentication secret:', secret)
     jwt.verify(token, secret, function(err, verifiedJwt) {
       if (err) {
         console.log(err)
         return res.status(401).send({ auth: false, message: 'Failed to authenticate token.' })
       } else {
         console.log(verifiedJwt)
+        res.status(200).send(verifiedJwt)
       }
     })
   }

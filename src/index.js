@@ -1,6 +1,5 @@
 'use strict'
 
-require('dotenv').config()
 require('console-stamp')(console, { pattern: 'dd/mm/yyyy HH:MM:ss.l' })
 const express = require('express')
 const { URL } = require('url')
