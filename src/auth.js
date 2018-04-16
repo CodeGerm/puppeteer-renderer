@@ -9,6 +9,7 @@ class Authentication {
   syncSecret() {
     if (signingSecret) {
       secret = signingSecret
+      console.log('local secret key:', secret)
     } else {
       AWS.config.update({ region: 'us-west-2' })
       var ssm = new AWS.SSM()
@@ -21,7 +22,7 @@ class Authentication {
           console.log(err, err.stack)
         } else {
           secret = data['Parameters'][0]['Value']
-          console.log('secret key:', secret)
+          console.log('ssm secret key:', secret)
         }
       })
     }
