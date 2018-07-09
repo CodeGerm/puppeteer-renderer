@@ -109,10 +109,8 @@ app.use(async (req, res, next) => {
         }
         
         let pdf=null;
-        //get latest page
+        //get page from cache
         if(flag==0){
-          pdf = await renderer.pdf(url, options)
-        }else{//get page from cache
           let pdf_path=url+'_pdf';
           let pdfCache=myCache.get(pdf_path);
           if(pdfCache==undefined){
@@ -120,7 +118,9 @@ app.use(async (req, res, next) => {
             myCache.set(pdf_path,pdf,10000);
           }else{
             pdf=pdfCache;
-          }     
+          }             
+        }else{//get latest page
+          pdf = await renderer.pdf(url, options)
         }
         res
           .set({
@@ -135,10 +135,8 @@ app.use(async (req, res, next) => {
       case 'screenshot':
         
         let image=null;
-        // get latest page
+        // get page from cache
         if(flag==0){
-          image = await renderer.screenshot(url, options)                
-        }else{  // get page from cache
           let image_path=url+'_image';
           let imageCache=myCache.get(image_path);       
           if(imageCache==undefined){
@@ -146,7 +144,9 @@ app.use(async (req, res, next) => {
             myCache.set(image_path,image,10000);
           }else{
             image=imageCache;
-          }      
+          }                
+        }else{  // get latest page
+          image = await renderer.screenshot(url, options)      
         }
         res
           .set({
