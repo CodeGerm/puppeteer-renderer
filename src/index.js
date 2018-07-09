@@ -6,6 +6,8 @@ const { URL } = require('url')
 const contentDisposition = require('content-disposition')
 const createRenderer = require('./renderer')
 const Auth = require('./auth')
+const NodeCache = require("node-cache");
+const myCache=new NodeCache({stdTTL:100, checkperiod:120});
 
 const port = process.env.PORT || 3000
 const disable_url = process.env.DISABLE_URL || false
@@ -26,7 +28,7 @@ app.disable('x-powered-by')
 
 // Render url.
 app.use(async (req, res, next) => {
-  let { url, uri, type, token, ...options } = req.query
+  let { url, uri, type, flag, token, ...options } = req.query
   if (req.url == '/healthcheck') {
     try {
       if (!healthcheck_url) {
@@ -41,7 +43,6 @@ app.use(async (req, res, next) => {
       next(e)
     }
   }
-
   if (!url && !uri) {
     return res
       .status(400)
@@ -56,6 +57,7 @@ app.use(async (req, res, next) => {
 	  url_protocol = protocol_env
   }
   if (disable_url && disable_url.toLowerCase() == 'true') {
+
     if (!uri) {
       return res.status(400).send('url disabled, please use uri')
     }
@@ -68,8 +70,6 @@ app.use(async (req, res, next) => {
     } else {
     	url = url_protocol + '://' + base_host + '/' + uri
     }
-    	
-    
     
     if(token){
     	if(url.indexOf('?') > -1) {
@@ -95,6 +95,7 @@ app.use(async (req, res, next) => {
   if (!disable_auth || disable_auth.toLowerCase() !== 'true') {
     authentication.authToken(token, res)
   }
+
   try {
     switch (type) {
       case 'pdf':
@@ -106,7 +107,21 @@ app.use(async (req, res, next) => {
           const extDotPosition = filename.lastIndexOf('.')
           if (extDotPosition > 0) filename = filename.substring(0, extDotPosition)
         }
-        const pdf = await renderer.pdf(url, options)
+        
+        let pdf=null;
+        //get latest page
+        if(flag==0){
+          pdf = await renderer.pdf(url, options)
+        }else{//get page from cache
+          let pdf_path=url+'_pdf';
+          let pdfCache=myCache.get(pdf_path);
+          if(pdfCache==undefined){
+            pdf = await renderer.pdf(url, options)
+            myCache.set(pdf_path,pdf,10000);
+          }else{
+            pdf=pdfCache;
+          }     
+        }
         res
           .set({
             'Content-Type': 'application/pdf',
@@ -114,16 +129,31 @@ app.use(async (req, res, next) => {
             'Content-Disposition': contentDisposition(filename + '.pdf'),
           })
           .send(pdf)
+        
         break
 
       case 'screenshot':
-        const image = await renderer.screenshot(url, options)
+        
+        let image=null;
+        // get latest page
+        if(flag==0){
+          image = await renderer.screenshot(url, options)                
+        }else{  // get page from cache
+          let image_path=url+'_image';
+          let imageCache=myCache.get(image_path);       
+          if(imageCache==undefined){
+            image = await renderer.screenshot(url, options)
+            myCache.set(image_path,image,10000);
+          }else{
+            image=imageCache;
+          }      
+        }
         res
           .set({
             'Content-Type': 'image/png',
             'Content-Length': image.length,
           })
-          .send(image)
+          .send(image)      
         break
 
       default:
