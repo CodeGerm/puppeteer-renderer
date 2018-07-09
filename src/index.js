@@ -161,9 +161,7 @@ app.use(async (req, res, next) => {
         res.status(200).send(html)
     }
   } catch (e) {
-    console.log("3");
     next(e)
-
   }
 })
 
