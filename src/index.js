@@ -6,8 +6,7 @@ const { URL } = require('url')
 const contentDisposition = require('content-disposition')
 const createRenderer = require('./renderer')
 const Auth = require('./auth')
-const NodeCache = require("node-cache");
-const myCache=new NodeCache({stdTTL:100, checkperiod:120});
+
 
 const port = process.env.PORT || 3000
 const disable_url = process.env.DISABLE_URL || false
@@ -15,6 +14,11 @@ const disable_auth = process.env.DISABLE_AUTH || false
 const healthcheck_url = process.env.HEALTHCHECK_URL || false
 const protocol_env = process.env.PROTOCOL || false
 const base_host = process.env.SSM_NAMESPACE || false
+const ttl_time=process.env.TTL_TIME || 120
+
+const NodeCache = require("node-cache");
+const myCache=new NodeCache({stdTTL: Number(ttl_time), checkperiod:120});
+
 
 let authentication = new Auth()
 authentication.syncSecret()
@@ -115,7 +119,7 @@ app.use(async (req, res, next) => {
           let pdfCache=myCache.get(pdf_path);
           if(pdfCache==undefined){
             pdf = await renderer.pdf(url, options)
-            myCache.set(pdf_path,pdf,10000);
+            myCache.set(pdf_path,pdf,ttl_time);
           }else{
             pdf=pdfCache;
           }             
@@ -141,7 +145,7 @@ app.use(async (req, res, next) => {
           let imageCache=myCache.get(image_path);       
           if(imageCache==undefined){
             image = await renderer.screenshot(url, options)
-            myCache.set(image_path,image,10000);
+            myCache.set(image_path,image,ttl_time);
           }else{
             image=imageCache;
           }                
