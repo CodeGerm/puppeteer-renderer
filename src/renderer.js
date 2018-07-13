@@ -31,8 +31,14 @@ class Renderer {
       }
       end= performance.now();
       if((end-start)>Number(delay)){
+        console.log("not finish loading")
         break;
       }
+    }
+    start=performance.now();
+    end=performance.now();
+    while(end-start<1000){
+      end=performance.now();
     }
     return finishLoaded;
   }
