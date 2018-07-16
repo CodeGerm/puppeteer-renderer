@@ -32,7 +32,7 @@ app.disable('x-powered-by')
 
 // Render url.
 app.use(async (req, res, next) => {
-  let { url, uri, type, flag, token, ...options } = req.query
+  let { url, uri, type, flag, token, ttl, ...options } = req.query
   if (req.url == '/healthcheck') {
     try {
       if (!healthcheck_url) {
@@ -119,7 +119,7 @@ app.use(async (req, res, next) => {
           let pdfCache=myCache.get(pdf_path);
           if(pdfCache==undefined){
             pdf = await renderer.pdf(url, options)
-            myCache.set(pdf_path,pdf,ttl_time);
+            myCache.set(pdf_path,pdf,ttl);
           }else{
             pdf=pdfCache;
           }             
@@ -145,7 +145,7 @@ app.use(async (req, res, next) => {
           let imageCache=myCache.get(image_path);       
           if(imageCache==undefined){
             image = await renderer.screenshot(url, options)
-            myCache.set(image_path,image,ttl_time);
+            myCache.set(image_path,image,ttl);
           }else{
             image=imageCache;
           }                
@@ -191,5 +191,7 @@ createRenderer()
 
 // Terminate process
 process.on('SIGINT', () => {
+  myCache.flushAll();
+  myCache.close();
   process.exit(0)
 })
