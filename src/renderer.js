@@ -2,9 +2,45 @@
 
 const puppeteer = require('puppeteer')
 const rimraf = require('rimraf');
+const {PerformanceObserver,performance} =require('perf_hooks');
+
 class Renderer {
   constructor(browser) {
     this.browser = browser
+  }
+
+  async isLoaded(page, delay){
+    let finishLoaded=null;
+    try{
+      finishLoaded = await page.$eval('#dashboardLoadedDone', el => el.value);
+    }catch(e){
+      try{
+        finishLoaded = await page.$eval('#exploreLoadedDone', el => el.value);
+      }catch(e){
+        await page.waitFor(Number(delay))
+      return;
+      }
+    }
+    let start=performance.now();
+    let end=null;
+    while(new String(finishLoaded).valueOf() =="no"){
+      try{
+        finishLoaded = await page.$eval('#dashboardLoadedDone', el => el.value);
+      }catch(e){
+        finishLoaded = await page.$eval('#exploreLoadedDone', el => el.value);
+      }
+      end= performance.now();
+      if((end-start)>Number(delay)){
+        console.log("not finish loading")
+        break;
+      }
+    }
+    start=performance.now();
+    end=performance.now();
+    while(end-start<1000){
+      end=performance.now();
+    }
+    return finishLoaded;
   }
 
   async createPage(url, { timeout, waitUntil, height, width, delay }) {
@@ -19,9 +55,9 @@ class Renderer {
     if(Number(width)>0 && Number(height)>0){
      await page.setViewport({width: Number(width), height: Number(height)});
     }
-    if(Number(delay)>0){   
-    await page.waitFor(Number(delay))
-    } 
+    if(Number(delay)>0){
+      const Loaded=await this.isLoaded(page,delay);
+    }
     return page
   }
 
@@ -38,6 +74,7 @@ class Renderer {
         		   localStorage.clear();
         		 });
         	console.log("Local Storage cleaned!");
+            await page.goto('about:blank')
             await page.close()
             console.log("Page closed!");
           }
@@ -66,6 +103,7 @@ class Renderer {
         		  
         		 });
         	console.log("Local Storage cleaned!");
+            await page.goto('about:blank')
             await page.close()
             console.log("Page closed!");
           }
@@ -77,7 +115,6 @@ class Renderer {
     try {
       const { timeout, waitUntil,height, width, delay, ...extraOptions } = options
       page = await this.createPage(url, { timeout, waitUntil, height, width, delay })
-
       const { fullPage, omitBackground } = extraOptions
       const buffer = await page.screenshot({
         ...extraOptions,
@@ -86,17 +123,19 @@ class Renderer {
       })
       return buffer
     } finally {
-    	
       if (page) {
     	await page.evaluate(() => {
     		   localStorage.clear();
     		 });
     	console.log("Local Storage cleaned!");
+        await page.goto('about:blank')
         await page.close()
         console.log("Page closed!");
       }
     }
   }
+
+
 
   async close() {
     await this.browser.close()
