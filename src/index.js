@@ -14,7 +14,7 @@ const disable_auth = process.env.DISABLE_AUTH || false
 const healthcheck_url = process.env.HEALTHCHECK_URL || false
 const protocol_env = process.env.PROTOCOL || false
 const base_host = process.env.SSM_NAMESPACE || false
-const ttl_time=process.env.TTL_TIME || 120
+const ttl_time=process.env.TTL_TIME || 3600
 
 const NodeCache = require("node-cache");
 const myCache=new NodeCache({stdTTL: Number(ttl_time), checkperiod:120});
@@ -32,7 +32,7 @@ app.disable('x-powered-by')
 
 // Render url.
 app.use(async (req, res, next) => {
-  let { url, uri, type, flag, token, ...options } = req.query
+  let { url, uri, type, flag, token, ttl, ...options } = req.query
   if (req.url == '/healthcheck') {
     try {
       if (!healthcheck_url) {
@@ -191,5 +191,7 @@ createRenderer()
 
 // Terminate process
 process.on('SIGINT', () => {
+  myCache.flushAll();
+  myCache.close();
   process.exit(0)
 })
