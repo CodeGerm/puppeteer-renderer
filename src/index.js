@@ -32,7 +32,7 @@ app.disable('x-powered-by')
 
 // Render url.
 app.use(async (req, res, next) => {
-  let { url, uri, type, flag, token, ttl, ...options } = req.query
+  let { url, uri, type, disable_cache, token, ttl, ...options } = req.query
   if (req.url == '/healthcheck') {
     try {
       if (!healthcheck_url) {
@@ -113,8 +113,10 @@ app.use(async (req, res, next) => {
         }
         
         let pdf=null;
-        //get page from cache
-        if(flag==0){
+        //get latest page 
+        if(disable_cache=="true"){
+          pdf = await renderer.pdf(url, options)             
+        }else{//get page from cache
           let pdf_path=url+'_pdf';
           let pdfCache=myCache.get(pdf_path);
           if(pdfCache==undefined){
@@ -122,9 +124,7 @@ app.use(async (req, res, next) => {
             myCache.set(pdf_path,pdf,ttl_time);
           }else{
             pdf=pdfCache;
-          }             
-        }else{//get latest page
-          pdf = await renderer.pdf(url, options)
+          }
         }
         res
           .set({
@@ -139,8 +139,10 @@ app.use(async (req, res, next) => {
       case 'screenshot':
         
         let image=null;
-        // get page from cache
-        if(flag==0){
+        // get latest page
+        if(disable_cache=="true"){ 
+          image = await renderer.screenshot(url, options)                   
+        }else{  // get page from cache
           let image_path=url+'_image';
           let imageCache=myCache.get(image_path);       
           if(imageCache==undefined){
@@ -148,9 +150,7 @@ app.use(async (req, res, next) => {
             myCache.set(image_path,image,ttl_time);
           }else{
             image=imageCache;
-          }                
-        }else{  // get latest page
-          image = await renderer.screenshot(url, options)      
+          } 
         }
         res
           .set({
