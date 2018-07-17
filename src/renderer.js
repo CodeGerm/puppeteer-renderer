@@ -35,11 +35,12 @@ class Renderer {
         break;
       }
     }
-    start=performance.now();
-    end=performance.now();
-    while(end-start<1500){
-      end=performance.now();
-    }
+    // start=performance.now();
+    // end=performance.now();
+    // while(end-start<1500){
+    //   end=performance.now();
+    // }
+    await page.waitFor(1500)
     return finishLoaded;
   }
 
