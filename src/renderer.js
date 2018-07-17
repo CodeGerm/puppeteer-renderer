@@ -37,7 +37,7 @@ class Renderer {
     }
     start=performance.now();
     end=performance.now();
-    while(end-start<1000){
+    while(end-start<1500){
       end=performance.now();
     }
     return finishLoaded;
