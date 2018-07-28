@@ -8,8 +8,6 @@ let start_time=performance.now();
 class Renderer {
   constructor(browser) {
     this.browser = browser
-    this.lock=false;
-    this.counter=0;
   }
 
   async isLoaded(page, delay){
