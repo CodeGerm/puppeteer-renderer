@@ -23,7 +23,7 @@
     "content-disposition": "^0.5.2",
     "express": "^4.16.2",
     "jsonwebtoken": "^8.2.1",
-    "puppeteer": "^1.0.0",
+    "puppeteer": "^1.6.0",
     "rimraf": "^2.6.2",
     "node-cache": "^4.2.0"
   },

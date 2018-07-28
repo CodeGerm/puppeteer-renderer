@@ -19,7 +19,7 @@ const ttl_time=process.env.TTL_TIME || 3600
 
 const NodeCache = require("node-cache");
 const myCache=new NodeCache({stdTTL: Number(ttl_time), checkperiod:120});
-
+var interval=1000*60*30;
 
 let authentication = new Auth()
 authentication.syncSecret()
@@ -43,6 +43,9 @@ app.use(async (req, res, next) => {
       }
       console.info('Health check called, visiting url: ' + url)
       const html = await renderer.render(url, options)
+      if(html==null){
+        return res.status(500).send('Oops, An unexpected error seems to have occurred: browser lose')
+      }   
       return res.status(200).send(html)
     } catch (e) {
       next(e)
@@ -116,13 +119,23 @@ app.use(async (req, res, next) => {
         let pdf=null;
         //get latest page 
         if(disable_cache=="true"){
-          pdf = await renderer.pdf(url, options)             
+          pdf = await renderer.pdf(url, options)
+          if(pdf==null){
+            return res.status(500).send('Oops, An unexpected error seems to have occurred: browser lose')
+          }             
         }else{//get page from cache
           let pdf_path=url+'_pdf';
           let pdfCache=myCache.get(pdf_path);
           if(pdfCache==undefined){
             pdf = await renderer.pdf(url, options)
-            myCache.set(pdf_path,pdf,ttl_time);
+            if(pdf==null){
+              return res.status(500).send('Oops, An unexpected error seems to have occurred: browser lose')
+            }
+            if(ttl==undefined){
+              myCache.set(pdf_path,pdf,ttl_time);
+            }else{
+              myCache.set(pdf_path,pdf,ttl);
+            }              
           }else{
             pdf=pdfCache;
           }
@@ -142,13 +155,23 @@ app.use(async (req, res, next) => {
         let image=null;
         // get latest page
         if(disable_cache=="true"){ 
-          image = await renderer.screenshot(url, options)                   
+          image = await renderer.screenshot(url, options)
+          if(image==null){
+            return res.status(500).send('Oops, An unexpected error seems to have occurred: browser lose')
+          }                    
         }else{  // get page from cache
           let image_path=url+'_image';
           let imageCache=myCache.get(image_path);       
           if(imageCache==undefined){
             image = await renderer.screenshot(url, options)
-            myCache.set(image_path,image,ttl_time);
+            if(image==null){
+              return res.status(500).send('Oops, An unexpected error seems to have occurred: browser lose')
+            }
+            if(ttl==undefined){
+              myCache.set(image_path,image,ttl_time);
+            }else{
+              myCache.set(image_path,image,ttl);
+            }        
           }else{
             image=imageCache;
           } 
@@ -163,6 +186,9 @@ app.use(async (req, res, next) => {
 
       default:
         const html = await renderer.render(url, options)
+        if(html==null){
+          return res.status(500).send('Oops, An unexpected error seems to have occurred: browser lose')
+        }
         res.status(200).send(html)
     }
   } catch (e) {
@@ -189,6 +215,12 @@ createRenderer()
   .catch(e => {
     console.error('Fail to initialze renderer.', e)
   })
+
+setInterval(function(){
+  renderer.restart();
+  //global.gc();
+},interval);
+
 
 // Terminate process
 process.on('SIGINT', () => {
