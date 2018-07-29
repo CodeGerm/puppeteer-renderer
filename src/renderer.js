@@ -156,11 +156,11 @@ class Renderer {
       let pages=await this.browser.pages();
       try{
         await Promise.all(pages.map(async page=>{
-          await page.waitFor(100)
-          await page.evaluate(() => {
-            localStorage.clear();
-          });
-          console.log(" Local Storage cleaned!");
+          //await page.waitFor(100)
+          // await page.evaluate(() => {
+          //   localStorage.clear();
+          // });
+          // console.log(" Local Storage cleaned!");
           await page.goto('about:blank')
           await page.close()
           page=null;
