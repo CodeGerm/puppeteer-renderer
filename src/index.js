@@ -148,12 +148,13 @@ app.use(async (req, res, next) => {
             'Content-Disposition': contentDisposition(filename + '.pdf'),
           })
           .send(pdf)
-        
         break
 
       case 'screenshot':
         
         let image=null;
+        let heapUsed = process.memoryUsage().heapUsed;
+        console.log("before open page Program is using " + heapUsed + " bytes of Heap.")
         // get latest page
         if(disable_cache=="true"){ 
           image = await renderer.screenshot(url, options)
@@ -182,7 +183,9 @@ app.use(async (req, res, next) => {
             'Content-Type': 'image/png',
             'Content-Length': image.length,
           })
-          .send(image)      
+          .send(image)  
+        heapUsed = process.memoryUsage().heapUsed;
+        console.log("after open page Program is using " + heapUsed + " bytes of Heap.")    
         break
 
       default:
@@ -217,14 +220,22 @@ createRenderer()
     console.error('Fail to initialze renderer.', e)
   })
 
-setInterval(function(){
-  renderer.restart();
+setInterval(async function(){
+  let heapUsed = process.memoryUsage().heapUsed;
+  console.log("before restart browser Program is using " + heapUsed + " bytes of Heap.")
+  await renderer.restart();
+  heapUsed = process.memoryUsage().heapUsed;
+  console.log("after restart browser Program is using " + heapUsed + " bytes of Heap.")
   //global.gc();
 },interval);
 
 setInterval(function(){
+  let heapUsed = process.memoryUsage().heapUsed;
+  console.log("before clear cache and gc Program is using " + heapUsed + " bytes of Heap.")
   myCache.flushAll();
   global.gc();
+  heapUsed = process.memoryUsage().heapUsed;
+  console.log("after clear cache and gc Program is using " + heapUsed + " bytes of Heap.")
 },cache_interval);
 
 

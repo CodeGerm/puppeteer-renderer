@@ -148,7 +148,7 @@ class Renderer {
   }
   async restart(){
     await this.close();
-    this.browser=await puppeteer.launch({ args: ['--no-sandbox','--disable-dev-shm-usage','--enable-heap-profiling','--enable-precise-memory-info']})
+    this.browser=await puppeteer.launch({ args: ['--no-sandbox','--disable-dev-shm-usage','--enable-precise-memory-info']})
   }
 
   async close() {   
@@ -156,11 +156,11 @@ class Renderer {
       let pages=await this.browser.pages();
       try{
         await Promise.all(pages.map(async page=>{
-          //await page.waitFor(100)
-          // await page.evaluate(() => {
-          //   localStorage.clear();
-          // });
-          // console.log(" Local Storage cleaned!");
+          await page.waitFor(100)
+          await page.evaluate(() => {
+            localStorage.clear();
+          });
+          console.log(" Local Storage cleaned!");
           await page.goto('about:blank')
           await page.close()
           page=null;
