@@ -126,6 +126,9 @@ class Renderer {
       if(page==null){
         return null;
       }
+      let heapUsed = process.memoryUsage().heapUsed;
+      //page.title().then(value=>console.log("before open page "+value+" Program is using " + heapUsed + " bytes of Heap."))
+      console.log("before open page "+page.mainFrame()._id+" Program is using " + heapUsed + " bytes of Heap.")
       const { fullPage, omitBackground } = extraOptions
       const buffer = await page.screenshot({
         ...extraOptions,
@@ -139,6 +142,9 @@ class Renderer {
     		   localStorage.clear();
     		 });
     	console.log("Local Storage cleaned!");
+        let heapUsed = process.memoryUsage().heapUsed;
+        //page.title().then(value=>console.log("after open page "+value+" Program is using " + heapUsed + " bytes of Heap."))
+        console.log("after open page "+page.mainFrame()._id+" Program is using " + heapUsed + " bytes of Heap.")
         await page.goto('about:blank')
         await page.close()
         page=null;
@@ -148,7 +154,7 @@ class Renderer {
   }
   async restart(){
     await this.close();
-    this.browser=await puppeteer.launch({ args: ['--no-sandbox','--disable-dev-shm-usage','--enable-heap-profiling','--enable-precise-memory-info']})
+    this.browser=await puppeteer.launch({ args: ['--no-sandbox','--disable-dev-shm-usage','--enable-precise-memory-info']})
   }
 
   async close() {   
@@ -156,11 +162,11 @@ class Renderer {
       let pages=await this.browser.pages();
       try{
         await Promise.all(pages.map(async page=>{
-          //await page.waitFor(100)
-          // await page.evaluate(() => {
-          //   localStorage.clear();
-          // });
-          // console.log(" Local Storage cleaned!");
+          await page.waitFor(100)
+          await page.evaluate(() => {
+            localStorage.clear();
+          });
+          console.log(" Local Storage cleaned!");
           await page.goto('about:blank')
           await page.close()
           page=null;
