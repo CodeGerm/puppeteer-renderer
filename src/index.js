@@ -153,8 +153,6 @@ app.use(async (req, res, next) => {
       case 'screenshot':
         
         let image=null;
-        let heapUsed = process.memoryUsage().heapUsed;
-        console.log("before open page Program is using " + heapUsed + " bytes of Heap.")
         // get latest page
         if(disable_cache=="true"){ 
           image = await renderer.screenshot(url, options)
@@ -183,9 +181,7 @@ app.use(async (req, res, next) => {
             'Content-Type': 'image/png',
             'Content-Length': image.length,
           })
-          .send(image)  
-        heapUsed = process.memoryUsage().heapUsed;
-        console.log("after open page Program is using " + heapUsed + " bytes of Heap.")    
+          .send(image)    
         break
 
       default:
