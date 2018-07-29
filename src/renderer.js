@@ -162,11 +162,13 @@ class Renderer {
       let pages=await this.browser.pages();
       try{
         await Promise.all(pages.map(async page=>{
+          console.log("before close browser before close page "+page.mainFrame()._id+" Program is using " + heapUsed + " bytes of Heap.")
           await page.waitFor(100)
           await page.evaluate(() => {
             localStorage.clear();
           });
           console.log(" Local Storage cleaned!");
+          console.log("before close browser after close page "+page.mainFrame()._id+" Program is using " + heapUsed + " bytes of Heap.")
           await page.goto('about:blank')
           await page.close()
           page=null;
