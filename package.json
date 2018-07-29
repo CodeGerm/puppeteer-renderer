@@ -6,7 +6,7 @@
   "description": "",
   "main": "src/index.js",
   "scripts": {
-    "start": "node src/index.js",
+    "start": "node --expose-gc src/index.js",
     "test": "mocha",
     "precommit": "lint-staged"
   },

@@ -153,11 +153,29 @@ class Renderer {
 
   async close() {   
     if(this.browser!=null){
-      await this.browser.close()
-      this.browser=null;
+      let pages=await this.browser.pages();
+      try{
+        await Promise.all(pages.map(async page=>{
+          await page.waitFor(100)
+          await page.evaluate(() => {
+            localStorage.clear();
+          });
+          console.log(" Local Storage cleaned!");
+          await page.goto('about:blank')
+          await page.close()
+          page=null;
+          console.log(" Page closed!");
+        }))
+      }catch(e){
+        console.log(e);
+      }finally{
+        await this.browser.close()
+        this.browser=null;
+      }
     }
   }
 }
+
 
 async function create() {
   const browser = await puppeteer.launch({ args: ['--no-sandbox','--disable-dev-shm-usage']})

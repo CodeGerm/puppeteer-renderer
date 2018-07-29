@@ -20,6 +20,7 @@ const ttl_time=process.env.TTL_TIME || 3600
 const NodeCache = require("node-cache");
 const myCache=new NodeCache({stdTTL: Number(ttl_time), checkperiod:120});
 var interval=1000*60*30;
+var cache_interval=1000*60*60*2;
 
 let authentication = new Auth()
 authentication.syncSecret()
@@ -220,6 +221,11 @@ setInterval(function(){
   renderer.restart();
   //global.gc();
 },interval);
+
+setInterval(function(){
+  myCache.flushAll();
+  global.gc();
+},cache_interval);
 
 
 // Terminate process
