@@ -37,6 +37,8 @@ app.disable('x-powered-by')
 app.use(async (req, res, next) => {
   let { url, uri, type, disable_cache, token, ttl, ...options } = req.query
   if (req.url == '/healthcheck') {
+    console.log("request ip:" +req.ip);
+    console.log("request hostname" + req.hostname);
     try {
       if (!healthcheck_url) {
         url = 'https://www.google.com'
