@@ -58,6 +58,7 @@ class Renderer {
     if(Number(delay)>0){
       const Loaded=await this.isLoaded(page,delay);
     }
+    await page.setCacheEnabled(false);
     return page
   }
 
@@ -159,7 +160,7 @@ class Renderer {
   }
   async restart(){
     await this.close();
-    this.browser=await puppeteer.launch({ args: ['--no-sandbox','--disable-dev-shm-usage','--media-cache-size=1','--disk-cache-size=1']})
+    this.browser=await puppeteer.launch({ args: ['--no-sandbox','--disable-dev-shm-usage','--media-cache-size=1','--disk-cache-size=1','--disable-application-cache','--disable-session-storage']})
   }
 
   async close() {   
@@ -197,7 +198,7 @@ class Renderer {
 
 
 async function create() {
-  const browser = await puppeteer.launch({ args: ['--no-sandbox','--disable-dev-shm-usage','--media-cache-size=1','--disk-cache-size=1']})
+  const browser = await puppeteer.launch({ args: ['--no-sandbox','--disable-dev-shm-usage','--media-cache-size=1','--disk-cache-size=1','--disable-application-cache','--disable-session-storage']})
   return new Renderer(browser)
 }
 
