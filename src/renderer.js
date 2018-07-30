@@ -87,8 +87,7 @@ class Renderer {
             await page.close()
             page=null;
             console.log("Page closed!");
-          }
-        
+          }   
     }
   }
 
@@ -160,7 +159,7 @@ class Renderer {
   }
   async restart(){
     await this.close();
-    this.browser=await puppeteer.launch({ args: ['--no-sandbox','--disable-dev-shm-usage','--enable-precise-memory-info']})
+    this.browser=await puppeteer.launch({ args: ['--no-sandbox','--disable-dev-shm-usage','--media-cache-size=1','--disk-cache-size=1']})
   }
 
   async close() {   
@@ -198,7 +197,7 @@ class Renderer {
 
 
 async function create() {
-  const browser = await puppeteer.launch({ args: ['--no-sandbox','--disable-dev-shm-usage']})
+  const browser = await puppeteer.launch({ args: ['--no-sandbox','--disable-dev-shm-usage','--media-cache-size=1','--disk-cache-size=1']})
   return new Renderer(browser)
 }
 
