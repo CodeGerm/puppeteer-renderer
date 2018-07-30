@@ -21,6 +21,7 @@ const NodeCache = require("node-cache");
 const myCache=new NodeCache({stdTTL: Number(ttl_time), checkperiod:120});
 var interval=1000*60*30;
 var cache_interval=1000*60*60*2;
+var gc_interval=1000*60*30
 
 let authentication = new Auth()
 authentication.syncSecret()
@@ -227,12 +228,19 @@ setInterval(async function(){
 
 setInterval(function(){
   let heapUsed = process.memoryUsage().heapUsed;
-  console.log("before clear cache and gc Program is using " + heapUsed + " bytes of Heap.")
+  console.log("before clear cache Program is using " + heapUsed + " bytes of Heap.")
   myCache.flushAll();
+  heapUsed = process.memoryUsage().heapUsed;
+  console.log("after clear cache Program is using " + heapUsed + " bytes of Heap.")
+},cache_interval);
+
+setInterval(function(){
+  let heapUsed = process.memoryUsage().heapUsed;
+  console.log("before gc Program is using " + heapUsed + " bytes of Heap.")
   global.gc();
   heapUsed = process.memoryUsage().heapUsed;
-  console.log("after clear cache and gc Program is using " + heapUsed + " bytes of Heap.")
-},cache_interval);
+  console.log("after gc Program is using " + heapUsed + " bytes of Heap.") 
+},gc_interval);
 
 
 // Terminate process
