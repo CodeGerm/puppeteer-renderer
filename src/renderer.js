@@ -160,7 +160,7 @@ class Renderer {
   }
   async restart(){
     await this.close();
-    this.browser=await puppeteer.launch({ args: ['--no-sandbox','--disable-dev-shm-usage','--media-cache-size=1','--disk-cache-size=1','--disable-application-cache','--disable-session-storage','--user-data-dir=/dev/null']})
+    this.browser=await puppeteer.launch({ args: ['--no-sandbox','--disable-dev-shm-usage','--media-cache-size=1','--disk-cache-size=1','--disable-application-cache','--disable-session-storage','--js-flags="--max-old-space-size=200"']})
   }
 
   async close() {   
@@ -198,7 +198,7 @@ class Renderer {
 
 
 async function create() {
-  const browser = await puppeteer.launch({ args: ['--no-sandbox','--disable-dev-shm-usage','--media-cache-size=1','--disk-cache-size=1','--disable-application-cache','--disable-session-storage','--user-data-dir=/dev/null']})
+  const browser = await puppeteer.launch({ executablePath: 'google-chrome-unstable',args: ['--no-sandbox','--disable-dev-shm-usage','--media-cache-size=1','--disk-cache-size=1','--disable-application-cache','--disable-session-storage','--js-flags="--max-old-space-size=200"']})
   return new Renderer(browser)
 }
 
