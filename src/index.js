@@ -41,7 +41,7 @@ app.use(async (req, res, next) => {
     console.log("request hostname" + req.hostname);
     try {
       if (!healthcheck_url) {
-        url = 'https://www.google.com'
+        url = 'https://www.linkedin.com'
       } else {
         url = healthcheck_url
       }
