@@ -36,7 +36,18 @@ app.disable('x-powered-by')
 // Render url.
 app.use(async (req, res, next) => {
   let { url, uri, type, disable_cache, token, ttl, ...options } = req.query
-  uri=encodeURIComponent(uri)
+  let parcel_index=uri.indexOf('parcel_name')
+  if(parcel_index>-1){
+    console.log(uri);
+    //let embedded_index=uri.indexOf('embedded')
+    let parcelvalue_encode=encodeURIComponent(uri.substring(parcel_index+12))
+    uri=uri.substring(0,parcel_index+12)+parcelvalue_encode;
+    console.log(uri.substring(0,parcel_index+12))
+    console.log(parcelvalue_encode)
+    //console.log(uri.substring(embedded_index-1))
+    console.log(uri);
+  }
+  //uri=encodeURIComponent(uri)
   if (req.url == '/healthcheck') {
     console.log("request ip:" +req.ip);
     console.log("request hostname" + req.hostname);
