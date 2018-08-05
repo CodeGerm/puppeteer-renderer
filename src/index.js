@@ -40,12 +40,12 @@ app.use(async (req, res, next) => {
     let parcel_index=uri.indexOf('parcel_name')
     if(parcel_index>-1){
       console.log(uri);
-      //let embedded_index=uri.indexOf('embedded')
-      let parcelvalue_encode=encodeURIComponent(uri.substring(parcel_index+12))
-      uri=uri.substring(0,parcel_index+12)+parcelvalue_encode;
+      let embedded_index=uri.indexOf('embedded')
+      let parcelvalue_encode=encodeURIComponent(uri.substring(parcel_index+12,embedded_index-1))
+      uri=uri.substring(0,parcel_index+12)+parcelvalue_encode+uri.substring(embedded_index-1);
       console.log(uri.substring(0,parcel_index+12))
       console.log(parcelvalue_encode)
-      //console.log(uri.substring(embedded_index-1))
+      console.log(uri.substring(embedded_index-1))
       console.log(uri);
     }
   }
