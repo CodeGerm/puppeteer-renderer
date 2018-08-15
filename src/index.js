@@ -5,7 +5,7 @@ const express = require('express')
 const { URL } = require('url')
 const contentDisposition = require('content-disposition')
 const createRenderer = require('./renderer')
-const Auth = require('./auth')
+
 
 
 
@@ -23,8 +23,12 @@ var interval=1000*60*30;
 var cache_interval=1000*60*60*2;
 var gc_interval=1000*60*30
 
-let authentication = new Auth()
-authentication.syncSecret()
+let authentication=null;
+if(disable_auth==false){
+  const Auth = require('./auth')
+  authentication = new Auth()
+  authentication.syncSecret()
+}
 
 const app = express()
 
