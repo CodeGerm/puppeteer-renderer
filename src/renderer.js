@@ -36,7 +36,7 @@ class Renderer {
         break;
       }
     }
-    //await page.waitFor(1500)
+    await page.waitFor(1500)
     return finishLoaded;
   }
 
