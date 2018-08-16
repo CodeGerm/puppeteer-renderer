@@ -48,18 +48,25 @@ class Renderer {
       timeout: Number(timeout) || 20 * 1000,
       waitUntil: waitUntil || 'networkidle2',
     }
-
-    const page = await this.browser.newPage()
-    await page.goto(url, gotoOptions)
-	
-    if(Number(width)>0 && Number(height)>0){
-     await page.setViewport({width: Number(width), height: Number(height)});
+    let page=null;
+    try{
+      page = await this.browser.newPage()
+      if(page.isClosed())
+        return null;
+      await page.goto(url, gotoOptions)
+      if(Number(width)>0 && Number(height)>0){
+        await page.setViewport({width: Number(width), height: Number(height)});
+      }
+      if(Number(delay)>0){
+        if(!page.isClosed()){
+          const Loaded=await this.isLoaded(page,delay);
+        }
+      }
+    }catch(e){
+      console.log(e);
+    }finally{
+      return page
     }
-    if(Number(delay)>0){
-      const Loaded=await this.isLoaded(page,delay);
-    }
-    await page.setCacheEnabled(false);
-    return page
   }
 
   async render(url, options) {
@@ -84,7 +91,7 @@ class Renderer {
           let heapUsed = process.memoryUsage().heapUsed;
           //page.title().then(value=>console.log("before open page "+value+" Program is using " + heapUsed + " bytes of Heap."))
           console.log("before open page "+page.mainFrame()._id+" Program is using " + heapUsed + " bytes of Heap.")
-            await page.goto('about:blank')
+            //await page.goto('about:blank')
             await page.close()
             page=null;
             console.log("Page closed!");
@@ -116,7 +123,7 @@ class Renderer {
         		  
         		 });
         	console.log("Local Storage cleaned!");
-            await page.goto('about:blank')
+            //await page.goto('about:blank')
             await page.close()
             page=null;
             console.log("Page closed!");
@@ -151,7 +158,7 @@ class Renderer {
         let heapUsed = process.memoryUsage().heapUsed;
         //page.title().then(value=>console.log("after open page "+value+" Program is using " + heapUsed + " bytes of Heap."))
         console.log("after open page "+page.mainFrame()._id+" Program is using " + heapUsed + " bytes of Heap.")
-        await page.goto('about:blank')
+        //await page.goto('about:blank')
         await page.close()
         page=null;
         console.log("Page closed!");
@@ -171,7 +178,6 @@ class Renderer {
           try{
             let heapUsed = process.memoryUsage().heapUsed;
             console.log("before close browser before close page "+page.mainFrame()._id+" Program is using " + heapUsed + " bytes of Heap.")
-            await page.waitFor(100)
             await page.evaluate(() => {
               localStorage.clear();              
             });
@@ -182,12 +188,15 @@ class Renderer {
             let heapUsed = process.memoryUsage().heapUsed;
             //heapUsed = process.memoryUsage().heapUsed;
             console.log("before close browser after close page "+page.mainFrame()._id+" Program is using " + heapUsed + " bytes of Heap.")
-            await page.goto('about:blank')
-            await page.close()
+            if(!page.isClosed()){
+              await page.close()
+            }
             page=null;
             console.log(" Page closed!");
           }
         }))
+      }catch(e){
+        console.log(e);
       }finally{
         await this.browser.close()
         this.browser=null;  
