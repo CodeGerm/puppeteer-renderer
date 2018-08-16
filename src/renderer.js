@@ -77,9 +77,9 @@ class Renderer {
       if(page==null){
         return null;
       }
-      let heapUsed = process.memoryUsage().heapUsed;
-      //page.title().then(value=>console.log("before open page "+value+" Program is using " + heapUsed + " bytes of Heap."))
-      console.log("before open page "+page.mainFrame()._id+" Program is using " + heapUsed + " bytes of Heap.")
+      // let heapUsed = process.memoryUsage().heapUsed;
+      // //page.title().then(value=>console.log("before open page "+value+" Program is using " + heapUsed + " bytes of Heap."))
+      // console.log("before open page "+page.mainFrame()._id+" Program is using " + heapUsed + " bytes of Heap.")
       const html = await page.content()
       return html
     } finally {
@@ -88,9 +88,9 @@ class Renderer {
         		   localStorage.clear();
         		 });
         	console.log("Local Storage cleaned!");
-          let heapUsed = process.memoryUsage().heapUsed;
-          //page.title().then(value=>console.log("before open page "+value+" Program is using " + heapUsed + " bytes of Heap."))
-          console.log("before open page "+page.mainFrame()._id+" Program is using " + heapUsed + " bytes of Heap.")
+          // let heapUsed = process.memoryUsage().heapUsed;
+          // //page.title().then(value=>console.log("before open page "+value+" Program is using " + heapUsed + " bytes of Heap."))
+          // console.log("before open page "+page.mainFrame()._id+" Program is using " + heapUsed + " bytes of Heap.")
             //await page.goto('about:blank')
             await page.close()
             page=null;
@@ -139,9 +139,9 @@ class Renderer {
       if(page==null){
         return null;
       }
-      let heapUsed = process.memoryUsage().heapUsed;
-      //page.title().then(value=>console.log("before open page "+value+" Program is using " + heapUsed + " bytes of Heap."))
-      console.log("before open page "+page.mainFrame()._id+" Program is using " + heapUsed + " bytes of Heap.")
+      // let heapUsed = process.memoryUsage().heapUsed;
+      // //page.title().then(value=>console.log("before open page "+value+" Program is using " + heapUsed + " bytes of Heap."))
+      // console.log("before open page "+page.mainFrame()._id+" Program is using " + heapUsed + " bytes of Heap.")
       const { fullPage, omitBackground } = extraOptions
       const buffer = await page.screenshot({
         ...extraOptions,
@@ -155,9 +155,9 @@ class Renderer {
     		   localStorage.clear();
     		 });
     	console.log("Local Storage cleaned!");
-        let heapUsed = process.memoryUsage().heapUsed;
-        //page.title().then(value=>console.log("after open page "+value+" Program is using " + heapUsed + " bytes of Heap."))
-        console.log("after open page "+page.mainFrame()._id+" Program is using " + heapUsed + " bytes of Heap.")
+        // let heapUsed = process.memoryUsage().heapUsed;
+        // //page.title().then(value=>console.log("after open page "+value+" Program is using " + heapUsed + " bytes of Heap."))
+        // console.log("after open page "+page.mainFrame()._id+" Program is using " + heapUsed + " bytes of Heap.")
         //await page.goto('about:blank')
         await page.close()
         page=null;
@@ -176,8 +176,8 @@ class Renderer {
       try{
         await Promise.all(pages.map(async page=>{
           try{
-            let heapUsed = process.memoryUsage().heapUsed;
-            console.log("before close browser before close page "+page.mainFrame()._id+" Program is using " + heapUsed + " bytes of Heap.")
+            // let heapUsed = process.memoryUsage().heapUsed;
+            // console.log("before close browser before close page "+page.mainFrame()._id+" Program is using " + heapUsed + " bytes of Heap.")
             await page.evaluate(() => {
               localStorage.clear();              
             });
@@ -185,14 +185,14 @@ class Renderer {
           } catch(e){
             console.log(e);
           }finally{           
-            let heapUsed = process.memoryUsage().heapUsed;
-            //heapUsed = process.memoryUsage().heapUsed;
-            console.log("before close browser after close page "+page.mainFrame()._id+" Program is using " + heapUsed + " bytes of Heap.")
+            // let heapUsed = process.memoryUsage().heapUsed;
+            // //heapUsed = process.memoryUsage().heapUsed;
+            // console.log("before close browser after close page "+page.mainFrame()._id+" Program is using " + heapUsed + " bytes of Heap.")
             if(!page.isClosed()){
               await page.close()
             }
             page=null;
-            console.log(" Page closed!");
+            console.log(" browsers Page closed!");
           }
         }))
       }catch(e){

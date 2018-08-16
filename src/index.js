@@ -16,12 +16,13 @@ const healthcheck_url = process.env.HEALTHCHECK_URL || false
 const protocol_env = process.env.PROTOCOL || false
 const base_host = process.env.SSM_NAMESPACE || false
 const ttl_time=process.env.TTL_TIME || 3600
-
+const healthcheck_ttl=1800
 const NodeCache = require("node-cache");
 const myCache=new NodeCache({stdTTL: Number(ttl_time), checkperiod:120});
 var interval=1000*60*30;
 var cache_interval=1000*60*60*2;
 var gc_interval=1000*60*30
+
 
 let authentication=null;
 if(disable_auth==false){
@@ -47,10 +48,6 @@ app.use(async (req, res, next) => {
       let embedded_index=uri.indexOf('embedded')
       let parcelvalue_encode=encodeURIComponent(uri.substring(parcel_index+12,embedded_index-1))
       uri=uri.substring(0,parcel_index+12)+parcelvalue_encode+uri.substring(embedded_index-1);
-      console.log(uri.substring(0,parcel_index+12))
-      console.log(parcelvalue_encode)
-      console.log(uri.substring(embedded_index-1))
-      console.log(uri);
     }
   }
   //uri=encodeURIComponent(uri)
@@ -64,10 +61,28 @@ app.use(async (req, res, next) => {
         url = healthcheck_url
       }
       console.info('Health check called, visiting url: ' + url)
-      const html = await renderer.render(url, options)
-      if(html==null){
-        return res.status(500).send('Oops, An unexpected error seems to have occurred: browser lose')
-      }   
+      let html=null;
+      if(disable_cache=="true"){
+        html = await renderer.render(url, options)
+        if(html==null){
+          return res.status(500).send('Oops, An unexpected error seems to have occurred: browser lose')
+        }
+      }else{
+        let healthCache=myCache.get(url);
+        if(healthCache==undefined){
+            html= await renderer.render(url, options)
+            if(html==null){
+              return res.status(500).send('Oops, An unexpected error seems to have occurred: browser lose')
+            }
+            myCache.set(url,html,healthcheck_ttl);             
+        }else{
+            html=healthCache;
+        }
+      }
+      // const html = await renderer.render(url, options)
+      // if(html==null){
+      //   return res.status(500).send('Oops, An unexpected error seems to have occurred: browser lose')
+      // }   
       return res.status(200).send(html)
     } catch (e) {
       next(e)
