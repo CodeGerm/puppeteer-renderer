@@ -43,11 +43,24 @@ app.use(async (req, res, next) => {
   let { url, uri, type, disable_cache, token, ttl, ...options } = req.query
   if(uri){
     let parcel_index=uri.indexOf('parcel_name')
+    let drillview_index=uri.indexOf('drillview');
     if(parcel_index>-1){
       console.log(uri);
       let embedded_index=uri.indexOf('embedded')
       let parcelvalue_encode=encodeURIComponent(uri.substring(parcel_index+12,embedded_index-1))
       uri=uri.substring(0,parcel_index+12)+parcelvalue_encode+uri.substring(embedded_index-1);
+    }else if(drillview_index>-1){
+      console.log(uri);
+      let firstAnd=uri.substring(drillview_index).indexOf('&');
+      if(firstAnd>-1){
+        let drillvalue_encode=encodeURIComponent(uri.substring(drillview_index+10,firstAnd))
+        uri=uri.substring(0,drillview_index+10)+drillvalue_encode+uri.substring(firstAnd);
+        console.log(uri);
+      }else{
+        let drillvalue_encode=encodeURIComponent(uri.substring(drillview_index+10))
+        uri=uri.substring(0,drillview_index+10)+drillvalue_encode;
+        console.log(uri);
+      }
     }
   }
   //uri=encodeURIComponent(uri)

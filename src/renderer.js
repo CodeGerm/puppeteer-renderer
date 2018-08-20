@@ -135,6 +135,8 @@ class Renderer {
     let page = null
     try {
       const { timeout, waitUntil,height, width, delay, ...extraOptions } = options
+      console.log(height);
+      console.log(width);
       page = await this.createPage(url, { timeout, waitUntil, height, width, delay })
       if(page==null){
         return null;
