@@ -154,6 +154,8 @@ app.use(async (req, res, next) => {
     authentication.authToken(token, res)
   }
 
+  const { timeout, waitUntil,height, width, delay, ...extraOptions } = options
+
   try {
     switch (type) {
       case 'pdf':
@@ -174,7 +176,8 @@ app.use(async (req, res, next) => {
             return res.status(500).send('Oops, An unexpected error seems to have occurred: browser lose')
           }             
         }else{//get page from cache
-          let pdf_path=url+'_pdf';
+          let pdf_path=url+'_'+height+'_'+width+'_'+delay+'_pdf';
+          console.log(pdf_path);
           let pdfCache=myCache.get(pdf_path);
           if(pdfCache==undefined){
             pdf = await renderer.pdf(url, options)
@@ -209,7 +212,8 @@ app.use(async (req, res, next) => {
             return res.status(500).send('Oops, An unexpected error seems to have occurred: browser lose')
           }                    
         }else{  // get page from cache
-          let image_path=url+'_image';
+          let image_path=url+'_'+height+'_'+width+'_'+delay+'_image';
+          console.log(image_path);
           let imageCache=myCache.get(image_path);       
           if(imageCache==undefined){
             image = await renderer.screenshot(url, options)
